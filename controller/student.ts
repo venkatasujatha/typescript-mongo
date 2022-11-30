@@ -37,9 +37,21 @@ const find = async (req: Request, res: Response) => {
     //const id =JSON.stringify(req.body.id);
     //console.log(id)
     req.body = req.body ? req.body : " ";
+    let resp;
     try {
-
-        const resp = await record.find(req.body).toArray();
+        //if Pagination params provided
+        if ((req.body.skip || req.body.skip === 0) && req.body.take) {
+            resp = await record
+              .find(req.body.where )
+              .limit(req.body.take)
+              .skip(req.body.skip)
+              .toArray();
+          }
+          //if Pagination params not provided
+          else {
+            resp = await record.find(req.body.where).toArray();
+          }
+        //const resp = await record.find(req.body).toArray();
 
         res.status(200).json({
             message: "based on request body data fetched successfully",
@@ -194,25 +206,38 @@ const deleteManyRecords = async (req: Request, res: Response) => {
     }
 }
 
-// //filtering
-// const filtering = async (req: Request, res: Response) => {
-//     //req.body.where =req.body.where?req.body.where:" ";
-//     try {
-//         var query = { name: (/req.body\w*/g)}
-//         console.log(query)
-//         const resp = await record.find(query).toArray();
-//         console.log(resp)
-//         res.status(200).json({
-//             message: "fetched the data successfully",
-//             resp: resp
-//         })
-//     }
-//     catch (error) {
-//         res.status(400).json({
-//             message: "unable to fetch the data"
-//         })
+//filtering
+const filtering = async (req: Request, res: Response) => {
+    //req.body.where =req.body.where?req.body.where:" ";
+    try {
+        var query = { name:  { $regex: '.*' + req.body.name + '.*' } }
 
-//     }
-// }
+        console.log(query)
+        const resp = await record.find(query).toArray();
 
-export { add, find, update, getAll, delete1, update1, updateMany, deleteManyRecords }
+        
+        // const { search } = req.body;
+        // const rgx = (pattern) => new RegExp(`.*${pattern}.*`);
+        // const searchRgx = rgx(search);
+
+        // const resp =await record.find({
+        //     $or: [
+        //       { name: { $regex: searchRgx, $options: "i" } },
+        //       { department: { $regex: searchRgx, $options: "i" } },
+        //     ],
+        //   })
+        console.log(resp)
+        res.status(200).json({
+            message: "fetched the data successfully",
+            resp: resp
+        })
+    }
+    catch (error) {
+        res.status(400).json({
+            message: "unable to fetch the data"
+        })
+
+    }
+}
+
+export { add, find, update, getAll, delete1, update1, updateMany, deleteManyRecords,filtering }

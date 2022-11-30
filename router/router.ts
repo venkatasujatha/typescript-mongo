@@ -11,7 +11,7 @@ router.delete('/deleterecord',studentController.delete1);
 router.put('/update1',studentController.update1);
 router.put("/updatemany",studentController.updateMany);
 router.delete("/deleteManyRecords",studentController.deleteManyRecords);
-//router.get("/filtering",studentController.filtering)
+router.get("/filtering",studentController.filtering)
 export{
     router
 }
